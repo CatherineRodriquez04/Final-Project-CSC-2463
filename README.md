@@ -28,7 +28,7 @@ When the arduino is connected a the volume slider can modify the brightness of a
   - Last the entire 30 seconds to win the game
 
 ### Project Link: https://catherinerodriquez04.github.io/Final-Project-CSC-2463/
-### Project Youtube Link:
+### Project Youtube Link: https://youtu.be/Xgy4PZGQwdQ
 ### Image of Game Screens:
 #### Start Screen
 ![Start-Screen](https://github.com/CatherineRodriquez04/Final-Project-CSC-2463/assets/114537594/54c27d0f-c6e8-4f15-b89e-9dd5ec10a13d)
