@@ -27,11 +27,22 @@ When the arduino is connected a the volume slider can modify the brightness of a
   - Move the bar to the location the asteroid is headed to avoid letting the asteroid hit Earth
   - Last the entire 30 seconds to win the game
 
-### Project Link:
+### Project Link: https://catherinerodriquez04.github.io/Final-Project-CSC-2463/
 ### Project Youtube Link:
 ### Image of Game Screens:
+#### Start Screen
+![Start-Screen](https://github.com/CatherineRodriquez04/Final-Project-CSC-2463/assets/114537594/54c27d0f-c6e8-4f15-b89e-9dd5ec10a13d)
+#### Rules Screen
+![Rules-Screen](https://github.com/CatherineRodriquez04/Final-Project-CSC-2463/assets/114537594/6aa9f4fd-bab6-4fbd-8818-0bbccc665338)
+#### In-Game Screen
+![In-Game-Screen](https://github.com/CatherineRodriquez04/Final-Project-CSC-2463/assets/114537594/cc5d4ee6-8e57-4b2b-91aa-f80a6d0fc11d)
+#### Win Screen
+![Win-Game-Screen](https://github.com/CatherineRodriquez04/Final-Project-CSC-2463/assets/114537594/75a69fab-ea54-4167-a14a-2e6e752dae56)
+#### Lost-Game Screen
+![Lost-Game-Screen](https://github.com/CatherineRodriquez04/Final-Project-CSC-2463/assets/114537594/e2526a76-4b10-4456-a78c-1c46af3923b6)
 
 ### Image of Arduino Setup:
+![Arduino Set Up](https://github.com/CatherineRodriquez04/Final-Project-CSC-2463/assets/114537594/92057630-331b-42c9-8bf9-a29546aca566)
 
 ### Future Developments
 - Make this a multiplayer game...
