@@ -1,9 +1,9 @@
 
 //ball
-var xBall = Math.floor(Math.random() * 500) + 50;
+var xBall = Math.floor(Math.random() * 800) + 50;
 var yBall = 50;
 var diameter = 20;
-var xBallSpeed = 5;
+var xBallSpeed = 5; //automatically set speed to easy level
 var yBallSpeed = 5;
 
 //paddle
@@ -23,6 +23,12 @@ let lostMan;
 let lostManFrame = 0;
 let winMan;
 let winManFrame = 0;
+let slider;
+
+//Game Levels
+let level1;
+let level2;
+let level3;
 
 //tone
 let soundButton;
@@ -45,8 +51,10 @@ let pattern = new Tone.Pattern(function (time, note ){
 let connectButton;
 let port;
 let writer, reader;
+let sensorData = {};
 const encoder = new TextEncoder();
 const decoder = new TextDecoder();
+let switchIsPressed = 1;
 
 
 //game state
@@ -58,13 +66,6 @@ const GameState = {
   LostGame: "LostGame"
 };
 
-//game levels (affects speed)
-//let level;
-// const gameLevel = new Map([ 
-//   ['Easy', 1],
-//   ['Medium', 2],
-//   ['Hard', 3]
-// ]);
 
 let game = { score: 0, maxScore: 0, maxTime: 30, elapsedTime: 0, state: GameState.Start};
 
@@ -77,9 +78,7 @@ function preload(){ //preload background image and animations
 
   //preload tone
   winGame = new Tone.Player('assets/WinGame.wav').toDestination();
-  winGame.volume.value = -15;
   lostGame = new Tone.Player('assets/LostGame.mp4').toDestination();
-  lostGame.volume.value = -35;
 
 }
 
@@ -87,14 +86,10 @@ function setup() {
   createCanvas(windowWidth, windowHeight);
   reset(); //restarts time with each game
 
-  synth.volume.value = -45;
+  slider = createSlider(0, 255, 127);
+  slider.position(50, 850);
+  slider.style('width', '150px');
 
-  //create level selection
-  // level = createSelect();
-  // level.position(10, 40);
-  // level.option("Easy", 5);
-  // level.option("Medium", 8);
-  // level.option("Hard", 10);
 
   if ("serial" in navigator) {
     // The Web Serial API is supported
@@ -108,6 +103,7 @@ function setup() {
     connectButton.style('color', 'white');
   }
 
+  //start tone button
   soundButton = createButton('Activate Audio');
   soundButton.position(1330,5);
   soundButton.mousePressed(audio);
@@ -118,11 +114,60 @@ function setup() {
   soundButton.style('font', 'Courier New');
   soundButton.style('color', 'white');
 
+  //game level (changes asteroid speed)
+  level1 = createButton('Easy');
+  level1.position(1325, 150);
+  level1.mousePressed(easy);
+  level1.style('width', '55px');
+  level1.style('height', '20px');
+  level1.style('font-size', '12px');
+  level1.style('background-color', 'black');
+  level1.style('font', 'Courier New');
+  level1.style('color', 'white');
+
+  level2 = createButton('Medium');
+  level2.position(1325, 175);
+  level2.mousePressed(medium);
+  level2.style('width', '60px');
+  level2.style('height', '20px');
+  level2.style('font-size', '12px');
+  level2.style('background-color', 'black');
+  level2.style('font', 'Courier New');
+  level2.style('color', 'white');
+
+  level3 = createButton('Hard');
+  level3.position(1325, 200);
+  level3.mousePressed(hard);
+  level3.style('width', '55px');
+  level3.style('height', '20px');
+  level3.style('font-size', '12px');
+  level3.style('background-color', 'black');
+  level3.style('font', 'Courier New');
+  level3.style('color', 'white');
+
+
 }
 
-function reset(){
+function easy(){ //easy level
+  xBallSpeed = 5;
+  yBallSpeed = 5;
+}
+
+function medium(){ //medium level
+  xBallSpeed = 8;
+  yBallSpeed = 8;
+}
+
+function hard(){ //hard level
+  xBallSpeed = 12;
+  yBallSpeed = 12;
+}
+
+function reset(){ //function used to reset values with new game
   game.elapsedTime = 0;
   game.score = 0;
+  xBall = Math.floor(Math.random() * 800) + 50;
+  yBall = 50;
 }
 
 //activates tone.js
@@ -135,11 +180,46 @@ function audio(){
 }
 
 function draw() {
-    
+
+  //volumes with slider
+  synth.volume.value = slider.value()/5 * -1;
+  winGame.volume.value = slider.value()/17 * -1;
+  lostGame.volume.value = slider.value()/7 * -1;
+
+  if(reader){
+    serialRead();
+  }
+
+  if (writer) {
+      writer.write(new Uint8Array([slider.value()]));
+  }
+
   
   switch(game.state){
     case GameState.Start: //start screen
       background(0);
+
+      greenValue = 0;
+      redValue = 0;
+
+      //text for slider
+      push();
+      fill(255);
+      textFont('Courier New');
+      textSize(20);
+      textAlign(CENTER);
+      text("Volume:", 130, 835);
+      pop();
+
+      //text for game modes
+      push();
+      fill(255);
+      textFont('Courier New');
+      textSize(20);
+      textAlign(CENTER);
+      text("Select Level:", 1350, 135);
+      pop();
+
       pattern.stop();
       melody.start();
 
@@ -168,12 +248,6 @@ function draw() {
       text("Save the Planet!", windowWidth/1.9, 150);
       //instructions
       textSize(40);
-      // if(!reader){
-      //   text("Press 'ENTER' to start!", 750, 800);
-      // }
-      // else{
-      //   text("Press button to start!", 750, 800);
-      // }
       text("Press 'ENTER' to start!", 750, 800);
       fill(255);
       textSize(20);
@@ -185,26 +259,46 @@ function draw() {
 
     case GameState.Rules: //rules screen
       background(100);
+
+      //text for slider
+      push();
+      fill(0);
+      textFont('Courier New');
+      textSize(20);
+      textAlign(CENTER);
+      text("Volume:", 130, 835);
+      pop();
+
+      //text for game modes
+      push();
+      fill(0);
+      textFont('Courier New');
+      textSize(20);
+      textAlign(CENTER);
+      text("Select Level:", 1350, 135);
+      pop();
+
       pattern.start();
       melody.stop();
 
       push();
       fill(230);
       noStroke();
-      textSize(60);
+      textSize(75);
       textAlign(CENTER);
       textFont('Courier New');
-      text("RULES: ", 750, 100);
+      text("RULES: ", 750, 120);
       textSize(50);
       textAlign(CENTER);
-      text("1. Use the 'LEFT' and 'RIGHT' arrow keys", 750, 220); //rule 1
-      text("to move the bar back and forth", 750, 280);
-      text("(or joystick if applicable)", 750, 340);
-      text("2. Select a level for game mode to reflect", 750, 450); //rule 2
-      text("how fast the asteroid will move", 750, 510);
-      text("(level shown through LED lights)", 750, 570);
-      text("Save the Planet before the time runs out!", 750, 720); //game objective
-      text("Press 'SHIFT' to return back to start", 750, 780);
+      text("1. Use the joystick to move the bar", 750, 250); //rule 1
+      text("back and forth", 750, 310);
+      text("2. Select a level for game mode to choose", 750, 420); //rule 2
+      text("how fast the asteroid will move", 750, 480);
+      text("3. Use the slider to adjust the volume", 750, 590);
+      text("and LED brightness", 750, 650);
+      text("Save the Planet before the time runs out!", 750, 760); //game objective
+      textSize(25);
+      text("Press 'SHIFT' to return back to start", 750, 840);
 
       pop();
 
@@ -213,7 +307,26 @@ function draw() {
 
     case GameState.Playing: //game screen
       background(0);
+
+      //text for game modes
+      push();
+      fill(255);
+      textFont('Courier New');
+      textSize(20);
+      textAlign(CENTER);
+      text("Select Level:", 1350, 135);
+      pop();
+
       image(pixelEarth, -175, windowHeight/1.25, 1800, 900);
+
+       //text for slider
+       push();
+       fill(255);
+       textFont('Courier New');
+       textSize(20);
+       textAlign(CENTER);
+       text("Volume:", 130, 835);
+       pop();
 
       //creating stars
       image(star, 50, 250, 100, 115, 0 + 750 * starFrame, 100, 800, 0);
@@ -266,6 +379,24 @@ function draw() {
       game.maxScore = max(game.score, game.maxScore); //changes max score if player scores higher
       background(0);
 
+      //text for slider
+      push();
+      fill(255);
+      textFont('Courier New');
+      textSize(20);
+      textAlign(CENTER);
+      text("Volume:", 130, 835);
+      pop(); 
+
+      //text for game modes
+      push();
+      fill(255);
+      textFont('Courier New');
+      textSize(20);
+      textAlign(CENTER);
+      text("Select Level:", 1350, 135);
+      pop();
+
       //box to hold score
       push();
       fill(0);
@@ -305,6 +436,24 @@ function draw() {
     case GameState.LostGame: //player loses game (by not beating the clock)
       game.maxScore = max(game.score, game.maxScore); //changes max score if player scores higher
       background(0);
+
+      //text for slider
+      push();
+      fill(255);
+      textFont('Courier New');
+      textSize(20);
+      textAlign(CENTER);
+      text("Volume:", 130, 835);
+      pop();
+
+      //text for game modes
+      push();
+      fill(255);
+      textFont('Courier New');
+      textSize(20);
+      textAlign(CENTER);
+      text("Select Level:", 1350, 135);
+      pop();
 
       //box to hold score
       push();
@@ -383,7 +532,6 @@ function keyPressed(){
     }
   }
 
-
   //move paddle
   if (keyCode === LEFT_ARROW){
     xPaddle -= 50;
@@ -391,26 +539,27 @@ function keyPressed(){
   else if (keyCode === RIGHT_ARROW){
     xPaddle += 50;
   }
+
 }
 
 function drawGame(){
-  // xBallSpeed = level.value();
-  // yBallSpeed = level.value();
 
-  // if(level.value() === 5){
-  //   xBallSpeed = 5;
-  //   yBallSpeed = 5;
-  // }
-  // else if(level.value() === 8){
-  //   xBallSpeed = 20;
-  //   yBallSpeed = 20;
-  // }
+  if(reader){
+    serialRead();
+  }
+
+
+  if (writer) {
+    writer.write(encoder.encode(xPaddle + "," + yPaddle + "\n"));
+  }
+
+  //sets arduino data
+  xPaddle = sensorData.Xaxis;
+
 
  //continuously change the ball's location
   xBall += xBallSpeed;
   yBall += yBallSpeed;
-
-
 
   //keeps ball within screen
   if (xBall < diameter/2 || xBall > windowWidth - 0.5 * diameter){
@@ -420,10 +569,9 @@ function drawGame(){
     yBallSpeed *= -1;
   }
 
-
   //checks for collision with paddle
-  if ((xBall > xPaddle &&
-    xBall < xPaddle + paddleWidth) &&
+  if ((xBall > xPaddle/1.5 &&
+    xBall < xPaddle/1.5 + paddleWidth) &&
     (yBall + (diameter * 6) >= yPaddle)) {
     xBallSpeed *= -1;
     yBallSpeed *= -1;
@@ -453,7 +601,7 @@ function drawGame(){
   //create paddle
   fill(0);
   stroke(255);
-  rect(xPaddle, yPaddle, paddleWidth, paddleHeight);
+  rect(xPaddle/1.5, yPaddle, paddleWidth, paddleHeight);
 }
 
 function starAnimation(){ //animation for stars
@@ -464,6 +612,18 @@ function starAnimation(){ //animation for stars
     starFrame = 0;
   }
 }
+
+async function serialRead() {
+  while (true) {
+    const { value, done } = await reader.read();
+    if (done) {
+      reader.releaseLock();
+      break;
+    }
+   //  console.log(value);
+    sensorData = JSON.parse(value);
+  }
+ }
 
 async function connect() {
   port = await navigator.serial.requestPort();
