@@ -1,4 +1,6 @@
 
+//Video: https://youtu.be/Xgy4PZGQwdQ
+
 //ball
 var xBall = Math.floor(Math.random() * 800) + 50;
 var yBall = 50;

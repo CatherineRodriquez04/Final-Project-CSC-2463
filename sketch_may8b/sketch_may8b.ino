@@ -1,4 +1,6 @@
 
+//Video: https://youtu.be/Xgy4PZGQwdQ
+
 #include <Arduino_JSON.h>
 
 const int numReadings = 10;
