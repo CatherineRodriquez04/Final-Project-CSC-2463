@@ -217,7 +217,7 @@ function draw() {
       textFont('Courier New');
       textSize(20);
       textAlign(CENTER);
-      text("Select Level:", 1350, 135);
+      text("Select Mode:", 1350, 135);
       pop();
 
       pattern.stop();
@@ -275,7 +275,7 @@ function draw() {
       textFont('Courier New');
       textSize(20);
       textAlign(CENTER);
-      text("Select Level:", 1350, 135);
+      text("Select Mode:", 1350, 135);
       pop();
 
       pattern.start();
@@ -314,7 +314,7 @@ function draw() {
       textFont('Courier New');
       textSize(20);
       textAlign(CENTER);
-      text("Select Level:", 1350, 135);
+      text("Select Mode:", 1350, 135);
       pop();
 
       image(pixelEarth, -175, windowHeight/1.25, 1800, 900);
@@ -394,7 +394,7 @@ function draw() {
       textFont('Courier New');
       textSize(20);
       textAlign(CENTER);
-      text("Select Level:", 1350, 135);
+      text("Select Mode:", 1350, 135);
       pop();
 
       //box to hold score
@@ -452,7 +452,7 @@ function draw() {
       textFont('Courier New');
       textSize(20);
       textAlign(CENTER);
-      text("Select Level:", 1350, 135);
+      text("Select Mode:", 1350, 135);
       pop();
 
       //box to hold score
